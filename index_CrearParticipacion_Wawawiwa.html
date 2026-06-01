@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Porra Wawawiwa</title>
+
+<style>
+  body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    background:#f4f6f9;
+    color:#222;
+  }
+
+  .container{
+    max-width:1100px;
+    margin:auto;
+    padding:20px;
+  }
+
+  h1{
+    text-align:center;
+    margin:20px 0;
+  }
+
+  .card{
+    background:white;
+    padding:15px;
+    margin-bottom:15px;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+  }
+
+  .match{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    padding:6px 0;
+    border-bottom:1px solid #eee;
+  }
+
+  select,input{
+    padding:6px;
+    border-radius:6px;
+    border:1px solid #ccc;
+  }
+
+  label{ display:block; margin-top:8px; }
+
+  button{
+    background:#1a73e8;
+    color:white;
+    padding:12px 18px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+  }
+
+  button:hover{ background:#1557b0; }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+  }
+
+  @media(max-width:900px){
+    .grid{ grid-template-columns:1fr; }
+  }
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🏆 Porra Wawawiwa</h1>
+
+<div class="card">
+  <label>Nombre</label>
+  <input id="nombre" />
+
+  <label>Contacto</label>
+  <input id="contacto" />
+</div>
+
+<div id="grupos"></div>
+
+<div class="card">
+  <h2>🏁 Eliminatorias</h2>
+
+  <div class="grid">
+    <div>
+      <h3>Cuartos (8 equipos)</h3>
+      <div id="cuartos"></div>
+    </div>
+
+    <div>
+      <h3>Semifinalistas (4 equipos)</h3>
+      <div id="semis"></div>
+    </div>
+  </div>
+
+  <h3>Final</h3>
+
+  <label>Campeón</label>
+  <select id="campeon"></select>
+
+  <label>Subcampeón</label>
+  <select id="subcampeon"></select>
+</div>
+
+<div class="card">
+  <h2>🎯 Premios</h2>
+
+  <label>Pichichi</label>
+  <input id="pichichi" />
+
+  <label>Pichichi español</label>
+  <input id="pichichi_espanol" />
+
+  <label>Mejor portero</label>
+  <input id="mejor_portero" />
+
+  <label>Mejor jugador</label>
+  <input id="mejor_jugador" />
+
+  <label>Mejor joven</label>
+  <input id="mejor_jugador_joven" />
+</div>
+
+<div style="text-align:center">
+  <button onclick="enviar()">Enviar participación</button>
+</div>
+
+</div>
+
+<script>
+
+// =====================
+// EQUIPOS
+// =====================
+const data = {
+ A:["Corea","México","Chequia","Sudáfrica"],
+ B:["Suiza","Catar","Canadá","Bosnia"],
+ C:["Brasil","Marruecos","Escocia","Haití"],
+ D:["Turquía","EE.UU.","Australia","Paraguay"],
+ E:["Alemania","Costa de Marfil","Ecuador","Curazao"],
+ F:["Holanda","Túnez","Japón","Suecia"],
+ G:["Bélgica","Egipto","Nueva Zelanda","Irán"],
+ H:["España","Uruguay","Arabia","Cabo Verde"],
+ I:["Francia","Senegal","Noruega","Irak"],
+ J:["Argentina","Argelia","Austria","Jordania"],
+ K:["Portugal","Colombia","Congo","Uzbekistán"],
+ L:["Inglaterra","Croacia","Ghana","Panamá"]
+};
+
+const allTeams = Object.values(data).flat();
+
+// =====================
+// GRUPOS
+// =====================
+const gdiv = document.getElementById("grupos");
+
+Object.keys(data).forEach(g=>{
+  const card=document.createElement("div");
+  card.className="card";
+
+  let html=`<h2>Grupo ${g}</h2>`;
+  html+=`<strong>${data[g].join(", ")}</strong>`;
+
+  for(let i=1;i<=4;i++){
+    html+=`
+      <label>${i}º
+        <select class="ranking" data-group="${g}">
+          ${data[g].map(t=>`<option>${t}</option>`).join("")}
+        </select>
+      </label>
+    `;
+  }
+
+  card.innerHTML=html;
+  gdiv.appendChild(card);
+});
+
+// =====================
+// PARTIDOS
+// =====================
+const matches = {
+ A:["Mexico-Sudafrica","Chequia-Sudafrica","Chequia-Mexico"],
+ B:["Canada-Bosnia","Suiza-Bosnia","Suiza-Canada"],
+ C:["Brasil-Marruecos","Escocia-Marruecos","Escocia-Brasil"],
+ D:["Australia-Turquia","EEUU-Australia","Turquia-EEUU"],
+ E:["CostaMarfil-Ecuador","Alemania-CostaMarfil","Ecuador-Alemania"],
+ F:["Holanda-Japon","Holanda-Suecia","Japon-Suecia"],
+ G:["Belgica-Egipto","Belgica-Iran","Egipto-Iran"],
+ H:["Espana-CaboVerde","Espana-Arabia","Uruguay-Espana"],
+ I:["Francia-Senegal","Noruega-Senegal","Noruega-Francia"],
+ J:["Argentina-Argelia","Argentina-Austria","Argelia-Austria"],
+ K:["Portugal-Congo","Portugal-Uzbekistan","Colombia-Portugal"],
+ L:["Inglaterra-Croacia","Inglaterra-Ghana","Croacia-Ghana"]
+};
+
+Object.keys(matches).forEach(g=>{
+  const card=document.createElement("div");
+  card.className="card";
+
+  let html=`<h2>Partidos ${g}</h2>`;
+
+  matches[g].forEach(m=>{
+    html+=`
+      <div class="match">
+        <strong>${m}</strong>
+
+        <select class="tipo">
+          <option value="1x2">1X2</option>
+          <option value="exacto">Exacto</option>
+          <option value="goleador">Goleador</option>
+        </select>
+
+        <span class="input-container">
+          <select class="valor">
+            <option>1</option>
+            <option>X</option>
+            <option>2</option>
+          </select>
+        </span>
+      </div>
+    `;
+  });
+
+  card.innerHTML=html;
+  gdiv.appendChild(card);
+});
+
+// dinámico
+document.addEventListener("change",e=>{
+  if(e.target.classList.contains("tipo")){
+    const c=e.target.parentElement.querySelector(".input-container");
+
+    if(e.target.value==="1x2"){
+      c.innerHTML=`<select class="valor"><option>1</option><option>X</option><option>2</option></select>`;
+    }
+    if(e.target.value==="exacto"){
+      c.innerHTML=`<input class="valor" placeholder="2-1">`;
+    }
+    if(e.target.value==="goleador"){
+      c.innerHTML=`<input class="valor" placeholder="Jugador">`;
+    }
+  }
+});
+
+// =====================
+// ELIMINATORIAS
+// =====================
+function fill(id,count){
+  const el=document.getElementById(id);
+  for(let i=1;i<=count;i++){
+    el.innerHTML+=`
+      <label>${i}
+        <select class="${id}">
+          ${allTeams.map(t=>`<option>${t}</option>`).join("")}
+        </select>
+      </label><br>
+    `;
+  }
+}
+
+fill("cuartos",8);
+fill("semis",4);
+
+const campeon=document.getElementById("campeon");
+const sub=document.getElementById("subcampeon");
+
+allTeams.forEach(t=>{
+  campeon.innerHTML+=`<option>${t}</option>`;
+  sub.innerHTML+=`<option>${t}</option>`;
+});
+
+// =====================
+// ENVIAR
+// =====================
+function enviar(){
+
+  const grupos={};
+
+  document.querySelectorAll(".card").forEach(c=>{
+
+    const h=c.querySelector("h2");
+    if(!h) return;
+
+    if(h.textContent.includes("Grupo")){
+      const g=h.textContent.replace("Grupo ","");
+      grupos[g]={clasificacion:[],partidos:{}};
+
+      c.querySelectorAll(".ranking").forEach(r=>{
+        grupos[g].clasificacion.push(r.value);
+      });
+    }
+
+    if(h.textContent.includes("Partidos")){
+      const g=h.textContent.replace("Partidos ","");
+      grupos[g].partidos={};
+
+      c.querySelectorAll(".match").forEach(m=>{
+        const match=m.querySelector("strong").textContent;
+        const tipo=m.querySelector(".tipo").value;
+        const valor=m.querySelector(".valor").value;
+        grupos[g].partidos[match]={tipo,valor};
+      });
+    }
+  });
+
+  const json={
+    participante:{
+      nombre:document.getElementById("nombre").value,
+      contacto:document.getElementById("contacto").value
+    },
+    grupos,
+    eliminatorias:{
+      cuartos:Array.from(document.querySelectorAll(".cuartos")).map(e=>e.value),
+      semifinalistas:Array.from(document.querySelectorAll(".semis")).map(e=>e.value),
+      campeon:campeon.value,
+      subcampeon:sub.value
+    },
+    premios:{
+      pichichi:document.getElementById("pichichi").value,
+      pichichi_espanol:document.getElementById("pichichi_espanol").value,
+      mejor_portero:document.getElementById("mejor_portero").value,
+      mejor_jugador:document.getElementById("mejor_jugador").value,
+      mejor_jugador_joven:document.getElementById("mejor_jugador_joven").value
+    }
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbyV5jxoPQB9K29Kp51JBp_Fk3RItjWagFjgDgwt3DM6yKPd9EMsFlLqIBYNyVZwXms1/exec",{
+      method: "POST",
+    mode: "no-cors",
+    headers: {
+        "Content-Type": "text/plain"
+    },
+    body: JSON.stringify({
+    sheet: "PARTICIPANTES",
+    nombre: json.participante.nombre,
+    data: JSON.stringify(json)
+  })
+});
+
+  alert("Enviado!");
+}
+
+</script>
+
+</body>
+</html>
