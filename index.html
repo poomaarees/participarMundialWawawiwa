@@ -5,70 +5,146 @@
 <title>Porra Wawawiwa</title>
 
 <style>
-  body{
-    font-family: Arial, sans-serif;
-    margin:0;
-    background:#f4f6f9;
-    color:#222;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
-  .container{
-    max-width:1100px;
-    margin:auto;
-    padding:20px;
-  }
+body{
+  margin:0;
+  font-family:Inter, Arial, sans-serif;
+  background: linear-gradient(135deg,#0b1b3a,#1d4ed8,#b91c1c);
+  background-attachment: fixed;
+  color:#111;
+}
 
-  h1{
-    text-align:center;
-    margin:20px 0;
-  }
+/* contenedor principal */
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:16px;
+}
 
-  .card{
-    background:white;
-    padding:15px;
-    margin-bottom:15px;
-    border-radius:12px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.08);
-  }
+/* título */
+h1{
+  text-align:center;
+  color:white;
+  margin:10px 0 20px;
+  font-size:28px;
+  letter-spacing:1px;
+}
 
-  .match{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    align-items:center;
-    padding:6px 0;
-    border-bottom:1px solid #eee;
-  }
+/* tarjetas */
+.card{
+  background:rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:12px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.2);
+}
 
-  select,input{
-    padding:6px;
-    border-radius:6px;
-    border:1px solid #ccc;
-  }
+/* inputs */
+input, select{
+  padding:6px 8px;
+  border-radius:6px;
+  border:1px solid #ddd;
+  font-size:13px;
+  width:100%;
+  box-sizing:border-box;
+}
 
-  label{ display:block; margin-top:8px; }
+label{
+  font-size:12px;
+  margin-top:6px;
+  display:block;
+  color:#333;
+}
 
-  button{
-    background:#1a73e8;
-    color:white;
-    padding:12px 18px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:16px;
-  }
+/* botón */
+button{
+  background:#facc15;
+  border:none;
+  padding:12px 18px;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+  font-size:14px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
 
-  button:hover{ background:#1557b0; }
+button:hover{
+  background:#eab308;
+}
 
-  .grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:15px;
-  }
+/* GRID grupos */
+#grupos{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:10px;
+}
 
-  @media(max-width:900px){
-    .grid{ grid-template-columns:1fr; }
-  }
+/* card grupo compacta */
+.group-card h2{
+  margin:0 0 5px;
+  font-size:14px;
+}
+
+.group-card strong{
+  font-size:11px;
+  color:#555;
+}
+
+/* ranking compacto */
+.group-card select{
+  margin-top:3px;
+}
+
+/* partidos */
+.match{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:6px 0;
+  border-bottom:1px solid #eee;
+}
+
+.match strong{
+  font-size:12px;
+  min-width:110px;
+}
+
+.match select,
+.match input{
+  font-size:12px;
+  padding:5px;
+}
+
+/* eliminatorias */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+@media(max-width:900px){
+  .grid{ grid-template-columns:1fr; }
+}
+
+/* sección final */
+.center{
+  text-align:center;
+}
+
+/* compactar espacio global */
+.card h2{
+  font-size:16px;
+  margin:0 0 8px;
+}
+
+.card h3{
+  font-size:13px;
+  margin:8px 0 5px;
+}
+
 </style>
 
 </head>
@@ -77,14 +153,14 @@
 
 <div class="container">
 
-<h1>🏆 Porra Wawawiwa</h1>
+<h1>🏆 PORRA MUNDIAL 2026</h1>
 
 <div class="card">
   <label>Nombre</label>
   <input id="nombre" />
+ <label style="display:none;">Contacto</label>
+<input id="contacto" style="display:none;" />
 
-  <label>Contacto</label>
-  <input id="contacto" />
 </div>
 
 <div id="grupos"></div>
@@ -94,12 +170,12 @@
 
   <div class="grid">
     <div>
-      <h3>Cuartos (8 equipos)</h3>
+      <h3>Cuartos</h3>
       <div id="cuartos"></div>
     </div>
 
     <div>
-      <h3>Semifinalistas (4 equipos)</h3>
+      <h3>Semis</h3>
       <div id="semis"></div>
     </div>
   </div>
@@ -116,24 +192,15 @@
 <div class="card">
   <h2>🎯 Premios</h2>
 
-  <label>Pichichi</label>
-  <input id="pichichi" />
-
-  <label>Pichichi español</label>
-  <input id="pichichi_espanol" />
-
-  <label>Mejor portero</label>
-  <input id="mejor_portero" />
-
-  <label>Mejor jugador</label>
-  <input id="mejor_jugador" />
-
-  <label>Mejor joven</label>
-  <input id="mejor_jugador_joven" />
+  <input placeholder="Pichichi" id="pichichi">
+  <input placeholder="Pichichi español" id="pichichi_espanol">
+  <input placeholder="Mejor portero" id="mejor_portero">
+  <input placeholder="Mejor jugador" id="mejor_jugador">
+  <input placeholder="Mejor joven" id="mejor_jugador_joven">
 </div>
 
-<div style="text-align:center">
-  <button onclick="enviar()">Enviar participación</button>
+<div class="center">
+  <button onclick="enviar()">Enviar porra</button>
 </div>
 
 </div>
@@ -161,13 +228,13 @@ const data = {
 const allTeams = Object.values(data).flat();
 
 // =====================
-// GRUPOS
+// GRUPOS UI
 // =====================
 const gdiv = document.getElementById("grupos");
 
 Object.keys(data).forEach(g=>{
   const card=document.createElement("div");
-  card.className="card";
+  card.className="card group-card";
 
   let html=`<h2>Grupo ${g}</h2>`;
   html+=`<strong>${data[g].join(", ")}</strong>`;
@@ -176,7 +243,8 @@ Object.keys(data).forEach(g=>{
     html+=`
       <label>${i}º
         <select class="ranking" data-group="${g}">
-          ${data[g].map(t=>`<option>${t}</option>`).join("")}
+          <option value="">—</option>
+          ${data[g].map(t=>`<option value="${t}">${t}</option>`).join("")}
         </select>
       </label>
     `;
@@ -186,71 +254,22 @@ Object.keys(data).forEach(g=>{
   gdiv.appendChild(card);
 });
 
-// =====================
-// PARTIDOS
-// =====================
-const matches = {
- A:["Mexico-Sudafrica","Chequia-Sudafrica","Chequia-Mexico"],
- B:["Canada-Bosnia","Suiza-Bosnia","Suiza-Canada"],
- C:["Brasil-Marruecos","Escocia-Marruecos","Escocia-Brasil"],
- D:["Australia-Turquia","EEUU-Australia","Turquia-EEUU"],
- E:["CostaMarfil-Ecuador","Alemania-CostaMarfil","Ecuador-Alemania"],
- F:["Holanda-Japon","Holanda-Suecia","Japon-Suecia"],
- G:["Belgica-Egipto","Belgica-Iran","Egipto-Iran"],
- H:["Espana-CaboVerde","Espana-Arabia","Uruguay-Espana"],
- I:["Francia-Senegal","Noruega-Senegal","Noruega-Francia"],
- J:["Argentina-Argelia","Argentina-Austria","Argelia-Austria"],
- K:["Portugal-Congo","Portugal-Uzbekistan","Colombia-Portugal"],
- L:["Inglaterra-Croacia","Inglaterra-Ghana","Croacia-Ghana"]
-};
+// evitar duplicados
+document.addEventListener("change",(e)=>{
+  if(!e.target.classList.contains("ranking")) return;
 
-Object.keys(matches).forEach(g=>{
-  const card=document.createElement("div");
-  card.className="card";
+  const group = e.target.dataset.group;
+  const selects = document.querySelectorAll(`.ranking[data-group="${group}"]`);
 
-  let html=`<h2>Partidos ${g}</h2>`;
+  const used = Array.from(selects).map(s=>s.value).filter(Boolean);
 
-  matches[g].forEach(m=>{
-    html+=`
-      <div class="match">
-        <strong>${m}</strong>
-
-        <select class="tipo">
-          <option value="1x2">1X2</option>
-          <option value="exacto">Exacto</option>
-          <option value="goleador">Goleador</option>
-        </select>
-
-        <span class="input-container">
-          <select class="valor">
-            <option>1</option>
-            <option>X</option>
-            <option>2</option>
-          </select>
-        </span>
-      </div>
-    `;
+  selects.forEach(sel=>{
+    const current = sel.value;
+    Array.from(sel.options).forEach(opt=>{
+      if(!opt.value) return;
+      opt.disabled = used.includes(opt.value) && opt.value !== current;
+    });
   });
-
-  card.innerHTML=html;
-  gdiv.appendChild(card);
-});
-
-// dinámico
-document.addEventListener("change",e=>{
-  if(e.target.classList.contains("tipo")){
-    const c=e.target.parentElement.querySelector(".input-container");
-
-    if(e.target.value==="1x2"){
-      c.innerHTML=`<select class="valor"><option>1</option><option>X</option><option>2</option></select>`;
-    }
-    if(e.target.value==="exacto"){
-      c.innerHTML=`<input class="valor" placeholder="2-1">`;
-    }
-    if(e.target.value==="goleador"){
-      c.innerHTML=`<input class="valor" placeholder="Jugador">`;
-    }
-  }
 });
 
 // =====================
@@ -264,7 +283,7 @@ function fill(id,count){
         <select class="${id}">
           ${allTeams.map(t=>`<option>${t}</option>`).join("")}
         </select>
-      </label><br>
+      </label>
     `;
   }
 }
@@ -284,34 +303,16 @@ allTeams.forEach(t=>{
 // ENVIAR
 // =====================
 function enviar(){
-
   const grupos={};
 
-  document.querySelectorAll(".card").forEach(c=>{
+  document.querySelectorAll(".group-card").forEach(c=>{
 
-    const h=c.querySelector("h2");
-    if(!h) return;
+    const g=c.querySelector("h2").textContent.replace("Grupo ","");
+    grupos[g]={clasificacion:[],partidos:{}};
 
-    if(h.textContent.includes("Grupo")){
-      const g=h.textContent.replace("Grupo ","");
-      grupos[g]={clasificacion:[],partidos:{}};
-
-      c.querySelectorAll(".ranking").forEach(r=>{
-        grupos[g].clasificacion.push(r.value);
-      });
-    }
-
-    if(h.textContent.includes("Partidos")){
-      const g=h.textContent.replace("Partidos ","");
-      grupos[g].partidos={};
-
-      c.querySelectorAll(".match").forEach(m=>{
-        const match=m.querySelector("strong").textContent;
-        const tipo=m.querySelector(".tipo").value;
-        const valor=m.querySelector(".valor").value;
-        grupos[g].partidos[match]={tipo,valor};
-      });
-    }
+    c.querySelectorAll(".ranking").forEach(r=>{
+      grupos[g].clasificacion.push(r.value);
+    });
   });
 
   const json={
@@ -335,7 +336,7 @@ function enviar(){
     }
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbyV5jxoPQB9K29Kp51JBp_Fk3RItjWagFjgDgwt3DM6yKPd9EMsFlLqIBYNyVZwXms1/exec",{
+ fetch("https://script.google.com/macros/s/AKfycbyV5jxoPQB9K29Kp51JBp_Fk3RItjWagFjgDgwt3DM6yKPd9EMsFlLqIBYNyVZwXms1/exec",{
       method: "POST",
     mode: "no-cors",
     headers: {
