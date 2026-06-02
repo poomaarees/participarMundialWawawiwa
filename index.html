@@ -100,7 +100,8 @@ button:hover{
 /* partidos */
 .match{
   display:flex;
-  align-items:center;
+  flex-wrap:wrap;
+  align-items:flex-start;
   justify-content:space-between;
   gap:8px;
   padding:6px 0;
@@ -110,6 +111,7 @@ button:hover{
 .match strong{
   font-size:12px;
   min-width:110px;
+  line-height:1.3;
 }
 
 .match select,
@@ -164,6 +166,7 @@ button:hover{
 </div>
 
 <div id="grupos"></div>
+
 
 <div class="card">
   <h2>🏁 Eliminatorias</h2>
@@ -225,7 +228,9 @@ const data = {
  L:["Inglaterra","Croacia","Ghana","Panamá"]
 };
 
-const allTeams = Object.values(data).flat();
+const sortOptions = arr => [...arr].sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'}));
+const allTeams = sortOptions(Object.values(data).flat());
+const emptyOption = `<option value="">—</option>`;
 
 // =====================
 // GRUPOS UI
@@ -236,15 +241,17 @@ Object.keys(data).forEach(g=>{
   const card=document.createElement("div");
   card.className="card group-card";
 
+  const teams = sortOptions(data[g]);
+
   let html=`<h2>Grupo ${g}</h2>`;
-  html+=`<strong>${data[g].join(", ")}</strong>`;
+  html+=`<strong>${teams.join(", ")}</strong>`;
 
   for(let i=1;i<=4;i++){
     html+=`
       <label>${i}º
         <select class="ranking" data-group="${g}">
           <option value="">—</option>
-          ${data[g].map(t=>`<option value="${t}">${t}</option>`).join("")}
+          ${teams.map(t=>`<option value="${t}">${t}</option>`).join("")}
         </select>
       </label>
     `;
@@ -272,6 +279,74 @@ document.addEventListener("change",(e)=>{
   });
 });
 
+
+// =====================
+// PARTIDOS
+// =====================
+const matches = {
+ A:["Mexico-Sudafrica","Chequia-Sudafrica","Chequia-Mexico"],
+ B:["Canada-Bosnia","Suiza-Bosnia","Suiza-Canada"],
+ C:["Brasil-Marruecos","Escocia-Marruecos","Escocia-Brasil"],
+ D:["Australia-Turquia","EEUU-Australia","Turquia-EEUU"],
+ E:["CostaMarfil-Ecuador","Alemania-CostaMarfil","Ecuador-Alemania"],
+ F:["Holanda-Japon","Holanda-Suecia","Japon-Sueja"],
+ G:["Belgica-Egipto","Belgica-Iran","Egipto-Iran"],
+ H:["Espana-CaboVerde","Espana-Arabia","Uruguay-Espana"],
+ I:["Francia-Senegal","Noruega-Senegal","Noruega-Francia"],
+ J:["Argentina-Argelia","Argentina-Austria","Argelia-Austria"],
+ K:["Portugal-Congo","Portugal-Uzbekistan","Colombia-Portugal"],
+ L:["Inglaterra-Croacia","Inglaterra-Ghana","Croacia-Ghana"]
+};
+
+Object.keys(matches).forEach(g=>{
+  const card=document.createElement("div");
+  card.className="card";
+
+  let html=`<h2>Partidos ${g}</h2>`;
+
+  matches[g].forEach(m=>{
+    html+=`
+      <div class="match">
+        <strong>${m}</strong>
+
+        <select class="tipo">
+          <option value="1x2">1X2</option>
+          <option value="exacto">Exacto</option>
+          <option value="goleador">Goleador</option>
+        </select>
+
+        <span class="input-container">
+          <select class="valor">
+            <option>1</option>
+            <option>X</option>
+            <option>2</option>
+          </select>
+        </span>
+      </div>
+    `;
+  });
+
+  card.innerHTML=html;
+  gdiv.appendChild(card);
+});
+
+// dinámico partidos
+document.addEventListener("change",e=>{
+  if(e.target.classList.contains("tipo")){
+    const c=e.target.parentElement.querySelector(".input-container");
+
+    if(e.target.value==="1x2"){
+      c.innerHTML=`<select class="valor"><option>1</option><option>X</option><option>2</option></select>`;
+    }
+    if(e.target.value==="exacto"){
+      c.innerHTML=`<input class="valor" placeholder="2-1">`;
+    }
+    if(e.target.value==="goleador"){
+      c.innerHTML=`<input class="valor" placeholder="Jugador">`;
+    }
+  }
+});
+
 // =====================
 // ELIMINATORIAS
 // =====================
@@ -281,6 +356,7 @@ function fill(id,count){
     el.innerHTML+=`
       <label>${i}
         <select class="${id}">
+          ${emptyOption}
           ${allTeams.map(t=>`<option>${t}</option>`).join("")}
         </select>
       </label>
@@ -294,6 +370,65 @@ fill("semis",4);
 const campeon=document.getElementById("campeon");
 const sub=document.getElementById("subcampeon");
 
+function validarFormulario(){
+  const nombre = document.getElementById("nombre").value.trim();
+  if(!nombre){
+    alert("Debes indicar tu nombre.");
+    document.getElementById("nombre").focus();
+    return false;
+  }
+
+  const rankings = Array.from(document.querySelectorAll(".group-card .ranking"));
+  if(rankings.some(r=>!r.value)){
+    alert("Debes completar todas las clasificaciones de los grupos.");
+    return false;
+  }
+
+  const cuartos = Array.from(document.querySelectorAll(".cuartos")).map(e=>e.value);
+  if(cuartos.some(v=>!v)){
+    alert("Debes completar todos los equipos de cuartos de final.");
+    return false;
+  }
+
+  const semis = Array.from(document.querySelectorAll(".semis")).map(e=>e.value);
+  if(semis.some(v=>!v)){
+    alert("Debes completar todos los equipos de semifinales.");
+    return false;
+  }
+
+  if(!campeon.value){
+    alert("Debes seleccionar un campeón.");
+    campeon.focus();
+    return false;
+  }
+
+  if(!sub.value){
+    alert("Debes seleccionar un subcampeón.");
+    sub.focus();
+    return false;
+  }
+
+  const premios = [
+    "pichichi",
+    "pichichi_espanol",
+    "mejor_portero",
+    "mejor_jugador",
+    "mejor_jugador_joven"
+  ];
+
+  const faltan = premios.filter(id=>!document.getElementById(id).value.trim());
+  if(faltan.length){
+    alert("Debes completar todos los campos de premios.");
+    document.getElementById(faltan[0]).focus();
+    return false;
+  }
+
+  return true;
+}
+
+campeon.innerHTML = emptyOption;
+sub.innerHTML = emptyOption;
+
 allTeams.forEach(t=>{
   campeon.innerHTML+=`<option>${t}</option>`;
   sub.innerHTML+=`<option>${t}</option>`;
@@ -303,12 +438,31 @@ allTeams.forEach(t=>{
 // ENVIAR
 // =====================
 function enviar(){
+  if(!validarFormulario()) return;
+  const tipoMap = {
+    "1x2":"1x2",
+    "exacto":"resultado_exacto",
+    "goleador":"goleador"
+  };
+  const matchData = {};
+
+  Object.keys(matches).forEach(g=>{
+    matchData[g]={};
+    const card = Array.from(document.querySelectorAll('.card')).find(c=> c.querySelector('h2')?.textContent===`Partidos ${g}`);
+    if(!card) return;
+    card.querySelectorAll('.match').forEach(matchEl=>{
+      const partido = matchEl.querySelector('strong').textContent;
+      const tipo = tipoMap[matchEl.querySelector('.tipo').value] || '';
+      const valor = matchEl.querySelector('.valor')?.value || '';
+      matchData[g][partido] = {tipo, valor};
+    });
+  });
+
   const grupos={};
 
   document.querySelectorAll(".group-card").forEach(c=>{
-
     const g=c.querySelector("h2").textContent.replace("Grupo ","");
-    grupos[g]={clasificacion:[],partidos:{}};
+    grupos[g]={clasificacion:[],partidos: matchData[g] || {}};
 
     c.querySelectorAll(".ranking").forEach(r=>{
       grupos[g].clasificacion.push(r.value);
